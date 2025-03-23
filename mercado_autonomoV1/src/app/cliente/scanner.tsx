@@ -1,7 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { View, Text, Button, StyleSheet } from "react-native";
-import { BarCodeScanner } from "expo-barcode-scanner";
+import { Camera } from "expo-camera";
 import { useRouter } from "expo-router";
+
+// Forçamos o cast para um componente React:
+const ExpoCamera = Camera as unknown as React.ComponentType<any>;
 
 export default function ScannerScreen() {
   const [hasPermission, setHasPermission] = useState<boolean | null>(null);
@@ -10,14 +13,13 @@ export default function ScannerScreen() {
 
   useEffect(() => {
     (async () => {
-      const { status } = await BarCodeScanner.requestPermissionsAsync();
+      const { status } = await Camera.requestCameraPermissionsAsync();
       setHasPermission(status === "granted");
     })();
   }, []);
 
   const handleBarCodeScanned = ({ data }: { data: string }) => {
     setScanned(true);
-    // Passa o produtoId como query parameter para a tela de carrinho
     router.push(`/cliente/carrinho?produtoId=${data}`);
   };
 
@@ -30,7 +32,7 @@ export default function ScannerScreen() {
 
   return (
     <View style={styles.container}>
-      <BarCodeScanner
+      <ExpoCamera
         onBarCodeScanned={scanned ? undefined : handleBarCodeScanned}
         style={styles.scanner}
       />
