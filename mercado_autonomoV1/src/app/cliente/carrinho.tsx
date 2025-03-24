@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { View, Text, Button, FlatList, StyleSheet, Image } from "react-native";
-import { useRouter, useSearchParams } from "expo-router";
+import { useLocalSearchParams } from "expo-router";
 
 interface Produto {
   id: string;
@@ -11,43 +11,69 @@ interface Produto {
 }
 
 export default function CarrinhoScreen() {
-  const router = useRouter();
   // Lê o parâmetro de query (produtoId) passado pela tela do scanner
-  const { produtoId } = useSearchParams<{ produtoId?: string }>();
+  const { produtoId } = useLocalSearchParams<{ produtoId?: string }>();
 
-  // Aqui você pode usar o produtoId para, por exemplo, adicionar o produto ao carrinho.
-  // Por enquanto, mantemos um carrinho mock:
   const [carrinho, setCarrinho] = useState<Produto[]>([
-    { id: "1", nome: "Refrigerante", preco: 5.99, imagem: "https://via.placeholder.com/50", quantidade: 1 },
-    { id: "2", nome: "Chocolate", preco: 3.50, imagem: "https://via.placeholder.com/50", quantidade: 1 },
+    {
+      id: "1",
+      nome: "Refrigerante",
+      preco: 5.99,
+      imagem: "https://via.placeholder.com/50",
+      quantidade: 1,
+    },
+    {
+      id: "2",
+      nome: "Chocolate",
+      preco: 3.5,
+      imagem: "https://via.placeholder.com/50",
+      quantidade: 1,
+    },
   ]);
 
+  // Se quiser, podemos usar produtoId para adicionar o item automaticamente
+  // ex: se produtoId === "1", setCarrinho([...carrinho, { id: '1', ... }])
+
   const aumentarQuantidade = (id: string) => {
-    setCarrinho(carrinho.map(produto =>
-      produto.id === id ? { ...produto, quantidade: produto.quantidade + 1 } : produto
-    ));
+    setCarrinho((prev) =>
+      prev.map((produto) =>
+        produto.id === id
+          ? { ...produto, quantidade: produto.quantidade + 1 }
+          : produto
+      )
+    );
   };
 
   const diminuirQuantidade = (id: string) => {
-    setCarrinho(carrinho.map(produto =>
-      produto.id === id && produto.quantidade > 1
-        ? { ...produto, quantidade: produto.quantidade - 1 }
-        : produto
-    ));
+    setCarrinho((prev) =>
+      prev.map((produto) =>
+        produto.id === id && produto.quantidade > 1
+          ? { ...produto, quantidade: produto.quantidade - 1 }
+          : produto
+      )
+    );
   };
 
-  const totalCompra = carrinho.reduce((total, item) => total + (item.preco * item.quantidade), 0);
+  const totalCompra = carrinho.reduce(
+    (total, item) => total + item.preco * item.quantidade,
+    0
+  );
 
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Carrinho</Text>
+      <Text style={{ textAlign: "center", marginBottom: 10 }}>
+        Param recebido: {produtoId}
+      </Text>
       <FlatList
         data={carrinho}
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => (
           <View style={styles.item}>
             <Image source={{ uri: item.imagem }} style={styles.imagem} />
-            <Text>{item.nome} - R$ {item.preco.toFixed(2)}</Text>
+            <Text>
+              {item.nome} - R$ {item.preco.toFixed(2)}
+            </Text>
             <View style={styles.quantidadeContainer}>
               <Button title="-" onPress={() => diminuirQuantidade(item.id)} />
               <Text>{item.quantidade}</Text>
@@ -57,7 +83,7 @@ export default function CarrinhoScreen() {
         )}
       />
       <Text style={styles.total}>Total: R$ {totalCompra.toFixed(2)}</Text>
-      <Button title="Ir para Checkout" onPress={() => router.push("/cliente/checkout")} />
+      <Button title="Ir para Checkout" onPress={() => { /* sua lógica */ }} />
     </View>
   );
 }
@@ -70,7 +96,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 24,
     fontWeight: "bold",
-    marginBottom: 20,
+    marginBottom: 10,
     textAlign: "center",
   },
   item: {

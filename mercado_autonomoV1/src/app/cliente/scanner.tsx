@@ -10,12 +10,12 @@ export default function ScannerScreen() {
   const [cameraType, setCameraType] = useState<CameraType>("back");
   const router = useRouter();
 
-  // Se permissão ainda não foi carregada
+  // Se a permissão ainda não foi carregada
   if (!permission) {
     return <View />;
   }
 
-  // Se não concedido, pede permissão
+  // Se a permissão não foi concedida
   if (!permission.granted) {
     return (
       <View style={styles.container}>
@@ -37,7 +37,11 @@ export default function ScannerScreen() {
   const handleBarCodeScanned = ({ data }: { data: string }) => {
     if (!scanned) {
       setScanned(true);
-      router.push(`/cliente/carrinho?produtoId=${data}`);
+      // Usamos router.push com objeto para passar parâmetros
+      router.push({
+        pathname: "/cliente/carrinho",
+        params: { produtoId: data },
+      });
     }
   };
 
@@ -48,7 +52,7 @@ export default function ScannerScreen() {
 
   return (
     <View style={styles.container}>
-      {/* Topo da tela com instruções ou logo */}
+      {/* Área de instruções e logo */}
       <View style={styles.infoContainer}>
         <Image
           source={require("../../../assets/images/your-logo.png")}
@@ -62,7 +66,7 @@ export default function ScannerScreen() {
         )}
       </View>
 
-      {/* Parte de baixo da tela com a câmera */}
+      {/* Área da câmera */}
       {cameraActive && (
         <View style={styles.cameraContainer}>
           <CameraView
