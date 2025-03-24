@@ -9,7 +9,7 @@ export default function HomeScreen() {
     <View style={styles.container}>
       <Text style={styles.title}>Bem-vindo ao GoMarket!</Text>
       <Button title="Entrar como Administrador" onPress={() => router.push("/admin")} />
-      <Button title="Entrar como Cliente" onPress={() => router.push("/cliente/scanner")} />
+      <Button title="Entrar como Cliente" onPress={() => router.push("/cliente/carrinho")} />
     </View>
   );
 }
